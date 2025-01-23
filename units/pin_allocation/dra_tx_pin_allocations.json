@@ -1,0 +1,41 @@
+// (*) means it's on the second expansion board
+
+{
+   "TC":{
+      "sspa_epc_p_cmd_on":4,
+      "sspa_epc_p_cmd_off":17,
+      "sspa_epc_p_endis_cmd":7,
+      "sspa_epc_r_cmd_on":27,
+      "sspa_epc_r_cmd_off":22,
+      "sspa_epc_r_endis_cmd":21,
+      "sspa_epc_z1_p_endis_cmd":16,
+      "sspa_epc_z2_p_endis_cmd":26,
+      "sspa_epc_z3_p_endis_cmd":8,
+      "sspa_epc_z1_r_endis_cmd":25,
+      "sspa_epc_z2_r_endis_cmd":20,
+      "sspa_epc_z3_r_endis_cmd":19
+   },
+   "TM":{
+      "sspa_epc_p_pwr_st":00,
+      "sspa_epc_p_endis_st":222,
+      "sspa_epc_r_pwr_st":111,
+      "sspa_epc_r_endis_st":333,
+      "sspa_epc_z1_p_pwr_st":0,
+      "sspa_epc_z1_p_endis_st":888,
+      "sspa_epc_z1_p_cur":8,
+      "sspa_epc_z2_p_pwr_st":2,
+      "sspa_epc_z2_p_endis_st":1010,
+      "sspa_epc_z2_p_cur":10,
+      "sspa_epc_z3_p_pwr_st":4,
+      "sspa_epc_z3_p_endis_st":1212,
+      "sspa_epc_z3_p_cur":12,
+      "sspa_epc_z1_r_pwr_st":1,
+      "sspa_epc_z1_r_endis_st":999,
+      "sspa_epc_z2_r_pwr_st":3,
+      "sspa_epc_z2_r_endis_st":1111,
+      "sspa_epc_z2_r_cur":11,
+      "sspa_epc_z3_r_pwr_st":5,
+      "sspa_epc_z3_r_endis_st":1313,
+      "sspa_epc_z3_r_cur":13
+   }
+}

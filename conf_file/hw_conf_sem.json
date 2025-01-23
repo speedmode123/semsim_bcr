@@ -1,0 +1,9 @@
+{
+   "dst_conf":{
+      "version": "Simulator"
+   },
+   "models":[
+      "pdu_n",
+      "pdu_r"
+   ]
+}

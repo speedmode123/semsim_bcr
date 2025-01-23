@@ -1,0 +1,8 @@
+psycopg2
+sqlalchemy<2.0
+sqlalchemy_utils
+sockets
+lgpio
+smbus
+spidev
+pyserial

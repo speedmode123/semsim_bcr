@@ -1,0 +1,50 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: oltp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - dem
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: pgadmin
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "5000:80"
+    depends_on:
+      - postgres
+    networks:
+      - dem
+
+  app:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile_app
+#    devices:  
+#      - "/dev/i2c-1:/dev/i2c-1"
+#      - "/dev/spidev0.0:/dev/spidev0.0"
+#      - "/dev/ttyS0:/dev/ttyS0"
+    ports:
+      - "5004:84/udp"
+    volumes:
+      - .:/paysim
+    depends_on:
+      - postgres
+    networks:
+      - dem
+
+networks:
+  dem:

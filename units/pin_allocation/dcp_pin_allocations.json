@@ -1,0 +1,12 @@
+{
+   "TC":{
+      "dcp_epc_n_cmd_on ":23,
+      "dcp_epc_n_cmd_off ":24,
+      "dcp_epc_r_cmd_on ":25,
+      "dcp_epc_r_cmd_off ":26
+   },
+   "TM":{
+      "dcp_epc_n_status  ":17,
+      "dcp_epc_r_status  ":27
+   }
+}

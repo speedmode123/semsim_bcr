@@ -1,0 +1,15 @@
+FROM python:3.11
+
+# Update the package lists
+RUN apt-get update
+
+COPY . .
+
+#WORKDIR /paysim
+WORKDIR .
+RUN ls -l
+
+# Install the dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+CMD ["python", "-u", "semsim.py"]

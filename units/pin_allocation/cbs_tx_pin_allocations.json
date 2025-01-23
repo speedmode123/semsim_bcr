@@ -1,0 +1,30 @@
+{
+   "TC":{
+      "sw_in_1_cmd_pos_1":4,
+      "sw_in_1_cmd_pos_2":17,
+      "sw_in_2_cmd_pos_1":27,
+      "sw_in_2_cmd_pos_2":22,
+      "sspa_lhcp_cmd_on":16,
+      "sspa_lhcp_cmd_off":25,
+      "sspa_spare_cmd_on":20,
+      "sspa_spare_cmd_off":8,
+      "sspa_rhcp_cmd_on":21,
+      "sspa_rhcp_cmd_off":7,
+      "sw_out_1_cmd_pos_1":19,
+      "sw_out_1_cmd_pos_2":26,
+      "sw_out_2_cmd_pos_1":14,
+      "sw_out_2_cmd_pos_2":15
+   },
+   "TM":{
+      "sw_in_1_st_pos":8,
+      "sw_in_2_st_pos":9,
+      "sspa_lhcp_st":6,
+      "sspa_lhcp_analog":12,
+      "sspa_spare_st":5,
+      "sspa_spare_analog":13,
+      "sspa_rhcp_st":7,
+      "sspa_rhcp_analog":14,
+      "sw_out_1_st_pos":10,
+      "sw_out_2_st_pos":11
+   }
+}
