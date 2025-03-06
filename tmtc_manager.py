@@ -2,7 +2,7 @@
 import time
 import os
 # HomeMade Py Libs
-from units import pdu
+from units import bcr, tm
 import psycopg2
 import socket
 from threading import *
@@ -35,64 +35,60 @@ def tmtc_manager(models_to_update, db_name, host, user, password, conf_file, loc
         UDPServerSocket.close()
 
 def cmd_processing(j_command_packet, apid, type, subtype, address, UDPServerSocket, db_name, host, user, password, conf_file, count):
-    for cmd, param_list in j_command_packet.items():
-        match cmd:
-            case "ObcHeartBeat":
-                PduHeartBeat = pdu.ObcHeartBeat(j_command_packet, apid, db_name, host, user, password, conf_file)
-                json_object = json.dumps(PduHeartBeat)
-                Response_PduHeartBeat = SpacePacketCommand(count, json_object, apid, type, subtype+1)
-                UDPServerSocket.sendto(Response_PduHeartBeat, address)
-                LOGGER.info(f"SEMSIM to OBC: {PduHeartBeat}")
-            case "GetPduStatus":
-                PduStatus = pdu.GetPduStatus(param_list, apid, db_name, host, user, password, conf_file)
-                json_object = json.dumps(PduStatus)
-                Response_PduStatus = SpacePacketCommand(count, json_object, apid, type, subtype+1)
-                UDPServerSocket.sendto(Response_PduStatus, address)
-                LOGGER.info(f"SEMSIM to OBC: {PduStatus}")
-            case "AddrUloadStart":
-                reply = param_list
-                LOGGER.info(f"param_list: {reply}")
-            case "AddrUloadData":
-                reply = param_list
-                LOGGER.info(f"param_list: {reply}")
-            case "AddrUloadAbort":
-                pass
-            case "AddrDloadRqst":
-                reply = param_list
-                LOGGER.info(f"param_list: {reply}")
-            case "AddrDAcknowledge":
-                reply = param_list
-                LOGGER.info(f"param_list: {reply}")
-            case "PduGoLoad":
-                pdu.PduGoTo(cmd, apid, db_name,host, user, password, conf_file)
-            case "PduGoSafe":
-                pdu.PduGoTo(cmd, apid, db_name,host, user, password, conf_file)
-            case "PduGoOperate":
-                pdu.PduGoTo(cmd, apid, db_name,host, user, password, conf_file)
-            case "SetUnitPwLines":
-                pdu.SetUnitPwLines(j_command_packet, apid, db_name, host, user, password,conf_file)
-            case "GetUnitLineStates":
-                PduUnitLineStates = pdu.GetUnitLineStates(param_list, apid, db_name,host, user, password, conf_file)
-                json_object = json.dumps(PduUnitLineStates)
-                Response_PduUnitLineStates = SpacePacketCommand(count, json_object, apid, type, subtype+1)
-                UDPServerSocket.sendto(Response_PduUnitLineStates, address)
-                LOGGER.info(f"SEMSIM to OBC: {PduUnitLineStates}")
-            case "ResetUnitPwLines":
-                pdu.SetUnitPwLines(j_command_packet, apid, db_name,host, user, password, conf_file)
-            case "OverwriteUnitPwLines":
-                pdu.SetUnitPwLines(j_command_packet, apid, db_name,host, user, password, conf_file)
-            case "GetRawMeasurements":
-                GetRawMeasurements = pdu.GetRawMeasurements(j_command_packet, apid, db_name, host, user, password, conf_file)
-                GetRawMeasurements_L = json.loads(GetRawMeasurements)
-                temp = GetRawMeasurements_L["GetRawMeasurements"]["RawMeasurements"]
-                voltage_measured = float(GetRawMeasurements_L["GetRawMeasurements"]["RawMeasurements"])
-                voltage_binary_representation = struct.unpack('!Q', struct.pack('!d',float(voltage_measured)))[0]
-                GetRawMeasurements_L["GetRawMeasurements"]["RawMeasurements"] = voltage_binary_representation
-                json_object = json.dumps(GetRawMeasurements_L)
-                Response_GetRawMeasurements = SpacePacketCommand(count, json_object, apid, type, subtype+1)
-                UDPServerSocket.sendto(Response_GetRawMeasurements, address)
-            case  _:
-                LOGGER.info(f"OBC cmd_name: {cmd} Not Implemented")
+    match type:
+        case 0x05:
+            EvR, type_r, subtype_r = bcr.Event_reporting(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+            EvRcheck, type_checkr, subtype_checkr = bcr.Request_completion_verification(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+            Response_EvRcheck = SpacePacketCommand(count, json.dumps(EvRcheck), apid, type_checkr, subtype_checkr)
+            UDPServerSocket.sendto(Response_EvRcheck, address)
+            if (EvR != 0) and (subtype_r != 0):
+                Response_EvR = SpacePacketCommand(count, json.dumps(EvR), apid, type_r, subtype_r)
+                UDPServerSocket.sendto(Response_EvR, address)
+                LOGGER.info(f"SEMSIM to OBC: {Response_EvR}")
+        case 0x06:
+            Mem, type_r, subtype_r = bcr.Memory_management(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+            Memcheck, type_checkr, subtype_checkr = bcr.Request_completion_verification(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+            if (Mem != 0) and (subtype_r != 0):
+                Response_Mem = SpacePacketCommand(count, json.dumps(Mem), apid, type_r, subtype_r)
+                UDPServerSocket.sendto(Response_Mem, address)
+                LOGGER.info(f"SEMSIM to OBC: {Response_Mem}")
+            Response_Memcheck = SpacePacketCommand(count, json.dumps(Memcheck), apid, type_checkr, subtype_checkr)
+            UDPServerSocket.sendto(Response_Memcheck, address)
+        case 0x08:
+            Fman, type_r, subtype_r = bcr.Function_management(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+            Fmancheck, type_checkr, subtype_checkr = bcr.Request_completion_verification(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+            if (Fman != 0) and (subtype_r != 0):
+                Response_Fman = SpacePacketCommand(count, json.dumps(Fman), apid, type_r, subtype_r)
+                UDPServerSocket.sendto(Response_Fman, address)
+                LOGGER.info(f"SEMSIM to OBC: {Response_Fman}") 
+            Response_Fmancheck = SpacePacketCommand(count, json.dumps(Fmancheck), apid, type_checkr, subtype_checkr)
+            UDPServerSocket.sendto(Response_Fmancheck, address)         
+        case 0x11:
+            RTest, type_r, subtype_r = bcr.Test_test(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+            RTestcheck, type_checkr, subtype_checkr = bcr.Request_completion_verification(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+            if (RTest != 0) and (subtype_r != 0):
+                if isinstance(RTest, list):
+                    for rt_test in RTest:
+                        Response_RTest = SpacePacketCommand(count, json.dumps(rt_test), apid, type_r, subtype_r)
+                        UDPServerSocket.sendto(Response_RTest, address)
+                        LOGGER.info(f"SEMSIM to OBC: {Response_RTest}")
+                else:
+                    Response_RTest = SpacePacketCommand(count, json.dumps(RTest), apid, type_r, subtype_r)
+                    UDPServerSocket.sendto(Response_RTest, address)
+                    LOGGER.info(f"SEMSIM to OBC: {Response_RTest}")
+            Response_RTestcheck = SpacePacketCommand(count, json.dumps(RTestcheck), apid, type_checkr, subtype_checkr)
+            UDPServerSocket.sendto(Response_RTestcheck, address)
+        case 0x14:
+            ObpM, type_r, subtype_r = bcr.OnBoard_parameter_management(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+            ObpMcheck, type_checkr, subtype_checkr = bcr.Request_completion_verification(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+            if (ObpM != 0) and (subtype_r != 0):
+                Response_ObpM = SpacePacketCommand(count, json.dumps(ObpM), apid, type_r, subtype_r)
+                UDPServerSocket.sendto(Response_ObpM, address)
+                LOGGER.info(f"SEMSIM to OBC: {Response_ObpM}")
+            Response_ObpMcheck = SpacePacketCommand(count, json.dumps(ObpMcheck), apid, type_checkr, subtype_checkr)
+            UDPServerSocket.sendto(Response_ObpMcheck, address)
+        case  _:
+            LOGGER.info(f"BCR type: {type}, subtype: {subtype} not Implemented")
     count =count + 1
 
 def cmd_unloader(packet_data_field):
@@ -100,17 +96,14 @@ def cmd_unloader(packet_data_field):
     j_command_packet = json.loads(command_packet)
     return j_command_packet
 
-
-def cmd_ack_generator(j_command_packet, apid, address, db_name, host, user, password, conf_file, UDPServerSocket):
+def cmd_ack_generator(j_command_packet, apid, type, subtype, address, db_name, host, user, password, conf_file, UDPServerSocket):
     try:
-        MsgAcknowlegement, TYPE, SUBTYPE = pdu.GetMsgAcknowlegement(j_command_packet, apid, db_name,host, user, password, conf_file)
-        json_object = json.dumps(MsgAcknowlegement)
-        ack_command = SpacePacketCommand(0x02, json_object, apid, TYPE, SUBTYPE)
-        UDPServerSocket.sendto(ack_command, address)
-        LOGGER.info(f"SEMSIM to OBC: {MsgAcknowlegement}")
+        verification_dict, type_r, subtype_r = bcr.Request_acceptance_verification(j_command_packet, apid, type, subtype, db_name, host, user, password, conf_file)
+        verification_message = SpacePacketCommand(0x01, json.dumps(verification_dict), apid, type_r, subtype_r)
+        UDPServerSocket.sendto(verification_message, address)
+        LOGGER.info(f"SEMSIM to OBC ACK: {verification_message}")
     except:
         print("Failed to Create Ack SpacePacket")
-        ack_command = {}
 
 def SpacePacketDecoder(buffer):
     try:
@@ -134,7 +127,7 @@ def SpacePacketCommand(count, command, apid, type, subtype):
     try:
         packet_dataframelength = len(bytes(command, 'utf-8'))
         tc_version = 0x00
-        tc_type = 0x01
+        tc_type = 0x00
         tc_dfh_flag = 0x01
         tc_apid = apid
         tc_seq_flag = 0x03
@@ -150,7 +143,7 @@ def SpacePacketCommand(count, command, apid, type, subtype):
         databytes = bytes([(tc_version << 5) + (tc_type << 4) + (tc_dfh_flag << 3) + (tc_apid >> 8), (tc_apid & 0xFF), (tc_seq_flag << 6) + (tc_seq_count >> 8), (tc_seq_count & 0xFF), (packet_datalength >> 8), (packet_datalength & 0xFF)])
         databytes += data_pack_data_field_header_frame
         databytes += bytes(command, 'utf-8')
-        LOGGER.info(f"SEMSIM to OBC FRAME: {databytes}")
+        #LOGGER.info(f"SEMSIM to OBC FRAME: {databytes}")
     except:
          databytes = 0
          print("Failed to Create SpacePacket")
@@ -162,18 +155,19 @@ def configurator(localIP, tclocalPort):
     return UDPServerSocket
 
 def customize_listening(UDPServerSocket, threads, db_name, host, user, password, conf_file):
-    bufferSize = 4096
+    bufferSize = 8192
     count = 0
     byteAddressPair = UDPServerSocket.recvfrom(bufferSize)
     message = byteAddressPair[0]
     address = byteAddressPair[1]
     if message:
-        clientIP  = "Client IP Address:{}".format(address)
-        LOGGER.info(f"{clientIP}")
-       # LOGGER.info(f"SIZE OF MESSAGE {len(message)}")
+        #clientIP  = "Client IP Address:{}".format(address)
+        #LOGGER.info(f"{clientIP}")
+        #LOGGER.info(f"SIZE OF MESSAGE {len(message)}")
         #LOGGER.info(f"MESSAGE {message}")
+        LOGGER.info(f"OBC to SEMSIM: {message}")
         data, apid, type, subtype = SpacePacketDecoder(message)
         j_command_packet = cmd_unloader(data)
-        LOGGER.info(f"OBC to SEMSIM: {j_command_packet}")
-        cmd_ack_generator(j_command_packet, apid, address, db_name, host, user, password, conf_file, UDPServerSocket)
+        #LOGGER.info(f"OBC to SEMSIM: {j_command_packet}")
+        cmd_ack_generator(j_command_packet, apid, type, subtype, address, db_name, host, user, password, conf_file, UDPServerSocket)
         cmd_processing(j_command_packet, apid, type, subtype, address, UDPServerSocket, db_name, host, user, password, conf_file, count)

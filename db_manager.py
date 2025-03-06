@@ -1,12 +1,6 @@
-# General Py Libs
-import time
-import os
 # HomeMade Py Libs
 import psycopg2
-import socket
 import json
-import configparser
-import re
 import random, logging, time, json
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -49,6 +43,13 @@ class db_manager:
         unit = data_set[0]
         tlm_read = data_set[1]
         return unit, tlm_read
+    
+    def read_entire_table_db(self, unit):
+        self.db_connect()
+        self.cursor.execute(f"SELECT * FROM {unit};")
+        table = list(self.cursor.fetchall())
+        self.db_disconnect()
+        return table
     
     def update_db(self, unit, tln_name, new_value):
         self.db_connect()

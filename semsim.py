@@ -5,13 +5,12 @@ import os
 
 # HomeMade Py Libs
 import db_manager
-from units import pdu
+from units import bcr
 import psycopg2, socket, threading
 from threading import *
 import threading
 from subprocess import Popen
 from tmtc_manager import tmtc_manager
-from mcp_manager import mcp_manager
 from subprocess import Popen
 from configurator import rtos_configurator
 import random, logging, time, json
@@ -21,12 +20,14 @@ LOGGER = logging.getLogger(__name__)
 
 
 def update_system(cursor, models_to_update, db_name, host, user, password, conf_file):
-    if "pdu" in str(models_to_update):
-        pdu.pdu_n(cursor, db_name, host, user, password, conf_file)
-        pdu.pdu_r(cursor, db_name, host, user, password, conf_file)
-    else:
-        pass
-        #LOGGER.info("NO CBAND TX to update")
+    for mdu in models_to_update:
+        match str(mdu):
+            case "bcr_nominal":
+                bcr.bcr_nominal(mdu[7:], db_name, host, user, password, conf_file)
+            case "bcr_redundant":
+                bcr.bcr_redundant(mdu[7:], db_name, host, user, password, conf_file)
+            case _:
+                LOGGER.info(f"models_to_update : {mdu} does not exist")
 
 def get_configuration_from_file():
     conf_read = rtos_configurator().get_conf_from_file()
@@ -88,8 +89,8 @@ def main():
     LOGGER.info("UDP server up and listening")
 
     time.sleep(1)
-    #listen_mcp_thread.start()
-    LOGGER.info("MCP server up and listening")
+    # listen_mcp_thread.start()
+    # LOGGER.info("MCP server up and listening")
 
     #LOOP
     LOGGER.info("RTOS READY")
@@ -97,7 +98,6 @@ def main():
         update_system(cursor, models_to_update, db_name, host, user, password, conf_file)
     else:
         listen_udp_thread.join()
-        listen_mcp_thread.join()
         rtos_checker.db_disconnect()
         cursor.close()
         conn.close()

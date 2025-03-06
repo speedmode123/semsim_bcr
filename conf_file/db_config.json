@@ -4,92 +4,79 @@
       "value":4096
    },
    "table_name":[
-      "pdu_n",
-      "pdu_r",
+      "bcr_nominal", 
+      "bcr_redundant",
       "rtos"
    ],
-   "pdu_n":[
+
+   "bcr_nominal":[
       {
          "unit":"STATE",
          "value":0
+      }, 
+      {
+         "unit": "systemMgr", 
+         "value": 0
+      },  
+      {
+         "unit": "comMgr", 
+         "value": 0
+      },  
+      {
+         "unit": "fdirMgr", 
+         "value": 0
+      }, 
+      {
+         "unit": "solarArraysMgr", 
+         "value": 0
       },
       {
-         "unit":"PduHeartBeat",
-         "value":0
+         "unit": "acceptanceVerificationReport", 
+         "value": 0
       },
       {
-         "unit":"PduStatus",
-         "value":0
+         "unit": "completionOfExecVerificationReport", 
+         "value": 0
       },
       {
-         "unit":"MsgAcknowledgment",
-         "value":0
-      },
-      {
-         "unit":"PduUnitLineStates",
-         "value":0
-      },
-      {
-         "unit":"PduRawMeasurements",
-         "value":0
-      },
-      {
-         "unit":"PduConvertedMeasurements",
-         "value":0
-      },
-      {
-         "unit":"AddrDloadStart",
-         "value":0
-      },
-      {
-         "unit":"AddrDloadData",
-         "value":0
-      },
-      {
-         "unit":"EmergencyReport",
-         "value":0
+         "unit": "Memory", 
+         "value": 0
       }
    ],
-   "pdu_r":[
+
+   "bcr_redundant":[
       {
          "unit":"STATE",
          "value":0
+      }, 
+      {
+         "unit": "systemMgr", 
+         "value": 0
+      },  
+      {
+         "unit": "comMgr", 
+         "value": 0
+      },  
+      {
+         "unit": "fdirMgr", 
+         "value": 0
+      }, 
+      {
+         "unit": "solarArraysMgr", 
+         "value": 0
       },
       {
-         "unit":"PduHeartBeat",
-         "value":0
+         "unit": "acceptanceVerificationReport", 
+         "value": 0
       },
       {
-         "unit":"PduStatus",
-         "value":0
-      },
+         "unit": "completionOfExecVerificationReport", 
+         "value": 0
+      }, 
       {
-         "unit":"MsgAcknowledgment",
-         "value":0
-      },
-      {
-         "unit":"PduUnitLineStates",
-         "value":0
-      },
-      {
-         "unit":"PduRawMeasurements",
-         "value":0
-      },
-      {
-         "unit":"PduConvertedMeasurements",
-         "value":0
-      },
-      {
-         "unit":"AddrDloadStart",
-         "value":0
-      },
-      {
-         "unit":"AddrDloadData",
-         "value":0
-      },
-      {
-         "unit":"EmergencyReport",
-         "value":0
+         "unit": "Memory", 
+         "value": 0
       }
    ]
+
 }
