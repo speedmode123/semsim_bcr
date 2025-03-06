@@ -1,9 +1,0 @@
-{
-   "TC":{
-      "mro_epc_1_cmd_on":4,
-      "mro_epc_2_cmd_on":17,
-      "mro_epc_3_cmd_on":27,
-      "one_pps_input_p":26,
-      "one_pps_input_r":2
-   }
-}

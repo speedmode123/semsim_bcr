@@ -111,8 +111,8 @@ if __name__ == "__main__":
       LOGGER.info(f"# SCENARIO {seq_count}: {test_id} TEST ")
       json_object = json.dumps(test[0])
       #                           SEQCOUNT MESS       APID  T ST
-      cmd2pdu = SpacePacketCommand(seq_count, json_object, APID, 20, test[1])
-      UDPCon = send_message(cmd2pdu)
+      cmd2bcr = SpacePacketCommand(seq_count, json_object, APID, 20, test[1])
+      UDPCon = send_message(cmd2bcr)
       if test[1] == 1 or test[1] == 6:
             for i in [0,1,2]:   
                 tlm_rcv = expecting_ack(UDPCon)

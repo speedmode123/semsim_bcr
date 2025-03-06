@@ -7,3 +7,5 @@ smbus
 spidev
 pyserial
 crc8
+fastcrc
+cobs

@@ -119,8 +119,8 @@ if __name__ == "__main__":
       LOGGER.info(f"# SCENARIO {seq_count}: {test_id} TEST ")
       json_object = json.dumps(test)
       #                           SEQCOUNT MESS       APID  T ST
-      cmd2pdu = SpacePacketCommand(seq_count, json_object, APID, 8, 1)
-      UDPCon = send_message(cmd2pdu)
+      cmd2bcr = SpacePacketCommand(seq_count, json_object, APID, 8, 1)
+      UDPCon = send_message(cmd2bcr)
       for i in [0,1]:   
             tlm_rcv = expecting_ack(UDPCon)
             packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
@@ -137,8 +137,8 @@ if __name__ == "__main__":
       LOGGER.info(f"# SCENARIO {seq_count}: {test_id} TEST ")
       json_object = json.dumps(test)
       #                           SEQCOUNT MESS       APID  T ST
-      cmd2pdu = SpacePacketCommand(seq_count, json_object, APID, 8, 1)
-      UDPCon = send_message(cmd2pdu)
+      cmd2bcr = SpacePacketCommand(seq_count, json_object, APID, 8, 1)
+      UDPCon = send_message(cmd2bcr)
       for i in [0,1]:   
             tlm_rcv = expecting_ack(UDPCon)
             packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)

@@ -97,8 +97,8 @@ if __name__ == "__main__":
         }
 
         json_object = json.dumps(HkTLm)
-        cmd2pdu = SpacePacketCommand(0, json_object, APID, 2, 1)
-        UDPCon = send_message(cmd2pdu)
+        cmd2bcr = SpacePacketCommand(0, json_object, APID, 2, 1)
+        UDPCon = send_message(cmd2bcr)
         FullHK = []
         for i in range(9):
             tlm_rcv = expecting_ack(UDPCon)

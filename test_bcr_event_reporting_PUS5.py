@@ -1,6 +1,8 @@
 import socket
 import json
 from threading import *
+from bcr_frame import encode_bcr_frame, decode_bcr_frame
+# import rs422_interface
 
 bufferSize = 4096
 EventId_list = [2560, 2561]
@@ -115,6 +117,11 @@ def decode_tlm(packet_data_field, apid, type, subtype):
     return jv_command_packet, apid, type, subtype
 
 if __name__ == "__main__":
+
+   # comm0 = rs422_interface.rs422_comm("/dev/ttyUSB0", 115200)
+   # rs422_interface.rs_422_listener(comm0)
+   # comm1 = rs422_interface.rs422_comm("/dev/ttyUSB1", 115200)
+   # rs422_interface.rs_422_listener(comm1)
   
    APID = 0x0A
 
@@ -126,66 +133,61 @@ if __name__ == "__main__":
       LOGGER.info(f"# SCENARIO {seq_count}: {test_id} TEST ")
       json_object = json.dumps(test[0])
       #                           SEQCOUNT MESS       APID  T ST
-      cmd2pdu = SpacePacketCommand(seq_count, json_object, APID, 5, test[1])
-      UDPCon = send_message(cmd2pdu)
-      if test[1] == 7:
-         for i in [0,1,2]:   
-            tlm_rcv = expecting_ack(UDPCon)
-            packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
-            decode_tlm(packet_data_field, apid, type, subtype)
-      else:
-          for i in [0,1]:   
-            tlm_rcv = expecting_ack(UDPCon)
-            packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
-            decode_tlm(packet_data_field, apid, type, subtype)
+      cmd2bcr = SpacePacketCommand(seq_count, json_object, APID, 5, test[1])
+      rs422_frame = encode_bcr_frame(asl_type=0x00, payload=cmd2bcr, ack_count=seq_count)
+      LOGGER.info(f"# RS422 Frame: {rs422_frame}")
+      decoded_frame = decode_bcr_frame(rs422_frame)
+      LOGGER.info(f"# RS422 Frame: {decoded_frame}")
+      # rs422_interface.write_command(comm1, rs422_frame, len(rs422_frame))
+      
       time.sleep(5)
       seq_count = seq_count+1
    LOGGER.info(f"### END TEST EVENT REPORTING PUS 5 2560 ###")
 
-   LOGGER.info(f"### TEST EVENT REPORTING PUS 5 2561 ###")
-   REPORT_GEN = [[List_Disable_Report_Gen, 7], [Enable_Report_Gen_2561, 5], [List_Disable_Report_Gen, 7], [Disable_Report_Gen_Both, 6], [List_Disable_Report_Gen, 7]]
-   seq_count = 0x00
-   for test in REPORT_GEN:
-      test_id = test[0]
-      LOGGER.info(f"# SCENARIO {seq_count}: {test_id} TEST ")
-      json_object = json.dumps(test[0])
-      #                           SEQCOUNT MESS       APID  T ST
-      cmd2pdu = SpacePacketCommand(seq_count, json_object, APID, 5, test[1])
-      UDPCon = send_message(cmd2pdu)
-      if test[1] == 7:
-         for i in [0,1,2]:   
-            tlm_rcv = expecting_ack(UDPCon)
-            packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
-            decode_tlm(packet_data_field, apid, type, subtype)
-      else:
-          for i in [0,1]:   
-            tlm_rcv = expecting_ack(UDPCon)
-            packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
-            decode_tlm(packet_data_field, apid, type, subtype)
-      time.sleep(5)
-      seq_count = seq_count+1
-   LOGGER.info(f"### END TEST EVENT REPORTING PUS 5 2561###")
+   # LOGGER.info(f"### TEST EVENT REPORTING PUS 5 2561 ###")
+   # REPORT_GEN = [[List_Disable_Report_Gen, 7], [Enable_Report_Gen_2561, 5], [List_Disable_Report_Gen, 7], [Disable_Report_Gen_Both, 6], [List_Disable_Report_Gen, 7]]
+   # seq_count = 0x00
+   # for test in REPORT_GEN:
+   #    test_id = test[0]
+   #    LOGGER.info(f"# SCENARIO {seq_count}: {test_id} TEST ")
+   #    json_object = json.dumps(test[0])
+   #    #                           SEQCOUNT MESS       APID  T ST
+   #    cmd2bcr = SpacePacketCommand(seq_count, json_object, APID, 5, test[1])
+   #    UDPCon = send_message(cmd2bcr)
+   #    if test[1] == 7:
+   #       for i in [0,1,2]:   
+   #          tlm_rcv = expecting_ack(UDPCon)
+   #          packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
+   #          decode_tlm(packet_data_field, apid, type, subtype)
+   #    else:
+   #        for i in [0,1]:   
+   #          tlm_rcv = expecting_ack(UDPCon)
+   #          packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
+   #          decode_tlm(packet_data_field, apid, type, subtype)
+   #    time.sleep(5)
+   #    seq_count = seq_count+1
+   # LOGGER.info(f"### END TEST EVENT REPORTING PUS 5 2561###")
 
-   LOGGER.info(f"### TEST EVENT REPORTING PUS 5 BOTH ###")
-   REPORT_GEN = [[List_Disable_Report_Gen, 7], [Enable_Report_Gen_Both, 5], [List_Disable_Report_Gen, 7], [Disable_Report_Gen_Both, 6], [List_Disable_Report_Gen, 7]]
-   seq_count = 0x00
-   for test in REPORT_GEN:
-      test_id = test[0]
-      LOGGER.info(f"# SCENARIO {seq_count}: {test_id} TEST ")
-      json_object = json.dumps(test[0])
-      #                           SEQCOUNT MESS       APID  T ST
-      cmd2pdu = SpacePacketCommand(seq_count, json_object, APID, 5, test[1])
-      UDPCon = send_message(cmd2pdu)
-      if test[1] == 7:
-         for i in [0,1,2]:   
-            tlm_rcv = expecting_ack(UDPCon)
-            packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
-            decode_tlm(packet_data_field, apid, type, subtype)
-      else:
-          for i in [0,1]:   
-            tlm_rcv = expecting_ack(UDPCon)
-            packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
-            decode_tlm(packet_data_field, apid, type, subtype)
-      time.sleep(5)
-      seq_count = seq_count+1
-   LOGGER.info(f"### END TEST EVENT REPORTING PUS 5 BOTH###")
+   # LOGGER.info(f"### TEST EVENT REPORTING PUS 5 BOTH ###")
+   # REPORT_GEN = [[List_Disable_Report_Gen, 7], [Enable_Report_Gen_Both, 5], [List_Disable_Report_Gen, 7], [Disable_Report_Gen_Both, 6], [List_Disable_Report_Gen, 7]]
+   # seq_count = 0x00
+   # for test in REPORT_GEN:
+   #    test_id = test[0]
+   #    LOGGER.info(f"# SCENARIO {seq_count}: {test_id} TEST ")
+   #    json_object = json.dumps(test[0])
+   #    #                           SEQCOUNT MESS       APID  T ST
+   #    cmd2bcr = SpacePacketCommand(seq_count, json_object, APID, 5, test[1])
+   #    UDPCon = send_message(cmd2bcr)
+   #    if test[1] == 7:
+   #       for i in [0,1,2]:   
+   #          tlm_rcv = expecting_ack(UDPCon)
+   #          packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
+   #          decode_tlm(packet_data_field, apid, type, subtype)
+   #    else:
+   #        for i in [0,1]:   
+   #          tlm_rcv = expecting_ack(UDPCon)
+   #          packet_data_field, apid, type, subtype = SpacePacketDecoder(tlm_rcv)
+   #          decode_tlm(packet_data_field, apid, type, subtype)
+   #    time.sleep(5)
+   #    seq_count = seq_count+1
+   # LOGGER.info(f"### END TEST EVENT REPORTING PUS 5 BOTH###")
